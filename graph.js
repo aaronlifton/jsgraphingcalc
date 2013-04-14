@@ -66,21 +66,27 @@ function showAxes(ctx,axes) {
  ctx.stroke();
 }
 
-function constructFn() {
-	var input = $("#userFn").val();
-	var inputFn = "return " + input;
+function genFn(part) {
+	var inputFn = ["return"];
 	
+	// pow
     var re1='(x)';	// Any Single Character 1
  	var re2='(\\^)';	// Any Single Character 2
  	var re3='(\\d+)';	// Integer Number 1
 	var r = new RegExp(re1+re2+re3,["i"]);
-	var match = r.exec(input);
+	var match = r.exec(part);
 	if (match != null && match.length > 0) {
 		power = match[3];
-		inputFn = "return " + "Math.pow(x,"+power+")";
+		inputFn.push("Math.pow(x,"+power+")");
 	}
 	
-	var f = new Function("x	", inputFn)
+	return inputFn.join(" ")
+}
+function constructFn() {
+	var input = $("#userFn").val();
+	
+	var fn = input.split(" ").map(genFn).join(" ");
+	var f = new Function("x	", 	fn)
 	drawFn(f);
 }
 
