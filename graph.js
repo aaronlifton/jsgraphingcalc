@@ -17,7 +17,7 @@ function draw() {
  funGraph(ctx,axes,fun2,"rgb(66,44,255)",2);
 }
 
-function drawFun(funX) {
+function drawFn(funX) {
  var canvas = document.getElementById("canvas");
  if (null==canvas || !canvas.getContext) return;
 
@@ -29,16 +29,22 @@ function drawFun(funX) {
  axes.scale = 40;                 // 40 pixels from x=0 to x=1
  axes.doNegativeX = true;
  showAxes(ctx,axes);
- funGraph(ctx,axes,funX,"rgb(22,190,50)",2); 
+ funGraph(ctx,axes,funX,"rgb(22,190,50)",1);
 }
- 
+
+function clear() {
+ var canvas = document.getElementById("canvas");
+ if (null==canvas || !canvas.getContext) return;
+ var axes={}, ctx=canvas.getContext("2d");
+ ctx.clearRect (0,0,canvas.width,canvas.height);
+} 
 
 function funGraph (ctx,axes,func,color,thick) {
  var xx, yy, dx=4, x0=axes.x0, y0=axes.y0, scale=axes.scale;
  var iMax = Math.round((ctx.canvas.width-x0)/dx);
  var iMin = axes.doNegativeX ? Math.round(-x0/dx) : 0;
  ctx.beginPath();
- ctx.lineWidth = thick;
+ // ctx.lineWidth = thick;
  ctx.strokeStyle = color;
 
  for (var i=iMin;i<=iMax;i++) {
@@ -59,3 +65,30 @@ function showAxes(ctx,axes) {
  ctx.moveTo(x0,0);    ctx.lineTo(x0,h);  // Y axis
  ctx.stroke();
 }
+
+function constructFn() {
+	var input = $("#userFn").val();
+	var inputFn = "return " + input;
+	
+    var re1='(x)';	// Any Single Character 1
+ 	var re2='(\\^)';	// Any Single Character 2
+ 	var re3='(\\d+)';	// Integer Number 1
+	var r = new RegExp(re1+re2+re3,["i"]);
+	var match = r.exec(input);
+	if (match != null && match.length > 0) {
+		power = match[3];
+		inputFn = "return " + "Math.pow(x,"+power+")";
+	}
+	
+	var f = new Function("x	", inputFn)
+	drawFn(f);
+}
+
+$(document).ready(function() {
+	$("#userFnSubmit").on("click", function() {
+		constructFn();
+	})
+	$("#test").on("click", function() {
+		drawFn(fun3);
+	})
+});
