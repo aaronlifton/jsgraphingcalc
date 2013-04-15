@@ -66,35 +66,53 @@ function showAxes(ctx,axes) {
  ctx.stroke();
 }
 
-function genFn(part) {
-	var inputFn = ["return"];
-	
+function genFn(part) {	
 	// pow
-    var re1='(x)';	// Any Single Character 1
+	var inputFn = [];
+    var re1='([0-9]|x)';	// Any Single Character 1
  	var re2='(\\^)';	// Any Single Character 2
  	var re3='(\\d+)';	// Integer Number 1
 	var r = new RegExp(re1+re2+re3,["i"]);
 	var match = r.exec(part);
-	if (match != null && match.length > 0) {
+	if(match != null && match.length > 0) {
 		power = match[3];
-		inputFn.push("Math.pow(x,"+power+")");
+		// inputFn.push("Math.pow(x,"+power+")");
+		var rr = part.replace(r, "Math.pow(" + match[1] +","+power+")");
+		inputFn.push(rr)
+	}
+	
+	// func(x+1)
+    var re4='((?:[a-z][a-z]+))';	// Word 1
+	
+	// fallback to part
+	if (inputFn.length == 0){
+		inputFn.push(part);
 	}
 	
 	return inputFn.join(" ")
 }
+
 function constructFn() {
 	var input = $("#userFn").val();
 	
 	var fn = input.split(" ").map(genFn).join(" ");
-	var f = new Function("x	", 	fn)
+	var f = new Function("x	", 	"return " + fn)
 	drawFn(f);
 }
 
 $(document).ready(function() {
 	$("#userFnSubmit").on("click", function() {
 		constructFn();
-	})
+	});
+	
 	$("#test").on("click", function() {
 		drawFn(fun3);
 	})
+	
+	$('#userFn').keypress(function (e) {
+	  if (e.which == 13) {
+    	e.preventDefault();
+	    $('#userFnSubmit').click();
+	  }
+	});
 });
