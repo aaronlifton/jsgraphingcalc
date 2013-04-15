@@ -9,7 +9,7 @@ function draw() {
  var axes={}, ctx=canvas.getContext("2d");
  axes.x0 = .5 + .5*canvas.width;  // x0 pixels from left to x=0
  axes.y0 = .5 + .5*canvas.height; // y0 pixels from top to y=0
- axes.scale = 40;                 // 40 pixels from x=0 to x=1
+ axes.scale = 80;                 // 40 pixels from x=0 to x=1
  axes.doNegativeX = true;
 
  showAxes(ctx,axes);
@@ -17,7 +17,7 @@ function draw() {
  funGraph(ctx,axes,fun2,"rgb(66,44,255)",2);
 }
 
-function drawFn(funX) {
+function drawFn(funX,color) {
  var canvas = document.getElementById("canvas");
  if (null==canvas || !canvas.getContext) return;
 
@@ -26,10 +26,10 @@ function drawFn(funX) {
  
  axes.x0 = .5 + .5*canvas.width;  // x0 pixels from left to x=0
  axes.y0 = .5 + .5*canvas.height; // y0 pixels from top to y=0
- axes.scale = 40;                 // 40 pixels from x=0 to x=1
+ axes.scale = 80;                 // 40 pixels from x=0 to x=1
  axes.doNegativeX = true;
  showAxes(ctx,axes);
- funGraph(ctx,axes,funX,"rgb(22,190,50)",1);
+ funGraph(ctx,axes,funX,color,1);
 }
 
 function clear() {
@@ -97,7 +97,10 @@ function constructFn() {
 	
 	var fn = input.split(" ").map(genFn).join(" ");
 	var f = new Function("x	", 	"return " + fn)
-	drawFn(f);
+	
+	var c = $('#color').children("option").filter(":selected").val()
+	
+	drawFn(f, c);
 }
 
 $(document).ready(function() {
@@ -106,7 +109,8 @@ $(document).ready(function() {
 	});
 	
 	$("#test").on("click", function() {
-		drawFn(fun3);
+		var c = $('#color').children("option").filter(":selected").val()
+		drawFn(fun3, c);
 	})
 	
 	$('#userFn').keypress(function (e) {
