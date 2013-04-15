@@ -111,6 +111,7 @@ function constructFn() {
 	var c = $('#color').children("option").filter(":selected").val()
 	
 	drawFn(f, c);
+	return fn;
 }
 
 $(document).ready(function() {
@@ -136,10 +137,10 @@ $(document).ready(function() {
         if ($R !== null) {
             a1 = $R.state().bindToInput($("#userFn"), function (v) { return v; });
             f1 = $R(function (x) {
-            	constructFn();
-            	return x;
+            	var c = constructFn();
+            	return c;
             }).bindTo(a1);
-            $R.dom($react1.find(".f1")).bindAttributeTo("innerHTML", a1);
+            $R.dom($react1.find(".f1")).bindAttributeTo("innerHTML", f1);
         }
     });
 
