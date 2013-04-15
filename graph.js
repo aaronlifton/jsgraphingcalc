@@ -1,20 +1,40 @@
-function fun1(x) {return Math.sin(x);  }
-function fun2(x) {return Math.cos(3*x);}
-function fun3(x) {return Math.sin(2*x);}
+"use strict";
+/*jslint browser:true */
+
+function fun1(x) { return Math.sin(x);  }
+function fun2(x) { return Math.cos(3 * x); }
+function fun3(x) { return Math.sin(2 * x); }
+function fun4(x) { return x * 2; }
+
+function showAxes(ctx, axes) {
+    var x0 = axes.x0,  w = ctx.canvas.width,
+        y0 = axes.y0,  h = ctx.canvas.height,
+		xmin = axes.doNegativeX ? 0 : x0;
+    ctx.beginPath();
+    ctx.strokeStyle = "rgb(128,128,128)";
+    ctx.moveTo(xmin, y0); // X axis
+	ctx.lineTo(w, y0);    // X axis
+    ctx.moveTo(x0, 0);    // Y axis
+	ctx.lineTo(x0, h);    // Y axis
+    ctx.stroke();
+}
 
 function draw() {
- var canvas = document.getElementById("canvas");
- if (null==canvas || !canvas.getContext) return;
-
- var axes={}, ctx=canvas.getContext("2d");
- axes.x0 = .5 + .5*canvas.width;  // x0 pixels from left to x=0
- axes.y0 = .5 + .5*canvas.height; // y0 pixels from top to y=0
- axes.scale = 80;                 // 40 pixels from x=0 to x=1
- axes.doNegativeX = true;
-
- showAxes(ctx,axes);
- funGraph(ctx,axes,fun1,"rgb(11,153,11)",1); 
- funGraph(ctx,axes,fun2,"rgb(66,44,255)",2);
+    var canvas, axes, ctx;
+	canvas = document.getElementById("canvas");
+    if (null === canvas || !canvas.getContext) {
+	    return;
+    }
+    axes = {};
+	ctx = canvas.getContext("2d");
+    axes.x0 = .5 + .5*canvas.width;  // x0 pixels from left to x=0
+    axes.y0 = .5 + .5*canvas.height; // y0 pixels from top to y=0
+    axes.scale = 80;                 // 40 pixels from x=0 to x=1
+    axes.doNegativeX = true;
+    showAxes(ctx, axes);
+    funGraph(ctx, axes,fun1,"rgb(11,153,11)",1);
+    funGraph(ctx, axes,fun2,"rgb(66,44,255)",2);
+	funGraph(ctx, axes, fun4, "rgb(99,88,125)", 3);
 }
 
 function drawFn(funX,color) {
@@ -55,17 +75,6 @@ function funGraph (ctx,axes,func,color,thick) {
  ctx.stroke();
 }
 
-function showAxes(ctx,axes) {
- var x0=axes.x0, w=ctx.canvas.width;
- var y0=axes.y0, h=ctx.canvas.height;
- var xmin = axes.doNegativeX ? 0 : x0;
- ctx.beginPath();
- ctx.strokeStyle = "rgb(128,128,128)"; 
- ctx.moveTo(xmin,y0); ctx.lineTo(w,y0);  // X axis
- ctx.moveTo(x0,0);    ctx.lineTo(x0,h);  // Y axis
- ctx.stroke();
-}
-
 function genFn(part) {	
 	// pow
 	var inputFn = [];
@@ -75,10 +84,11 @@ function genFn(part) {
 	var r = new RegExp(re1+re2+re3,["i"]);
 	var match = r.exec(part);
 	if(match != null && match.length > 0) {
-		power = match[3];
-		// inputFn.push("Math.pow(x,"+power+")");
-		var rr = part.replace(r, "Math.pow(" + match[1] +","+power+")");
-		inputFn.push(rr)
+		if(match[3] !== null) {
+			// inputFn.push("Math.pow(x,"+power+")");
+			var rr = part.replace(r, "Math.pow(" + match[1] +","+match[3]+")");
+			inputFn.push(rr)
+		}
 	}
 	
 	// func(x+1)
@@ -119,4 +129,18 @@ $(document).ready(function() {
 	    $('#userFnSubmit').click();
 	  }
 	});
+	
+	$(function () {
+        var $react1, a1, f1;
+        $react1 = $(".fn.reactive");
+        if ($R !== null) {
+            a1 = $R.state().bindToInput($("#userFn"), function (v) { return v; });
+            f1 = $R(function (x) {
+            	constructFn();
+            	return x;
+            }).bindTo(a1);
+            $R.dom($react1.find(".f1")).bindAttributeTo("innerHTML", a1);
+        }
+    });
+
 });

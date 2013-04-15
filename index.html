@@ -3,6 +3,8 @@
 <head>
 	<title>Canvas code example</title>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="reactive.js"></script>
+	<script type="text/javascript" src="reactive.dom.js"></script>
 	<script type="text/javascript" src="graph.js"></script>
 </head>
 
@@ -15,6 +17,9 @@
 		<option value="rgb(66,44,255)">Blue</option>
 		</select>
 		<button type="submit" id="userFnSubmit">Graph</button>
+		<div class="fn reactive">
+			<span class="f1">f1</span>
+		</div>
 	</div>
 	<canvas id="canvas" width="1004" height="502"></canvas>
 </body>
