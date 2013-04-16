@@ -34,7 +34,7 @@ function draw() {
     showAxes(ctx, axes);
     funGraph(ctx, axes,fun1,"rgb(11,153,11)",1);
     funGraph(ctx, axes,fun2,"rgb(66,44,255)",2);
-	funGraph(ctx, axes, fun4, "rgb(99,88,125)", 3);
+	funGraph(ctx, axes, fun4, "rgb(255,51,51)", 3);
 }
 
 function drawFn(funX,color,clear) {
@@ -95,7 +95,15 @@ function genFn(part) {
 	}
 	
 	// func(x+1)
-    var re4='((?:[a-z][a-z]+))';	// Word 1
+    var pre='((?:[a-z][a-z]+))';
+    var parens='(\\((.*?)\\))';
+    r = new RegExp(pre+parens,["i"]);
+	match = r.exec(part);
+	if (match != null) {
+		var rr = part.replace(r, "Math."+match[1]+"("+match[3]+")");
+		inputFn.push(rr);
+		console.log(match.join(" "));
+	}
 	
 	// fallback to part
 	if (inputFn.length == 0){
@@ -108,21 +116,30 @@ function genFn(part) {
 function constructFn() {
 	var input = $("#userFn").val();
 	var fnxs = input.split(",");
-	
-	
-	var c = $('#color').children("option").filter(":selected").val()
+	var ci = 0;
+	var c = $('#color').children("option");
+	for(var i=0;i<c.length;i++) {
+		if ($(c[i]).is(":selected")) {
+			ci=i;
+		}
+	}
 	if (fnxs.length > 1) {
 		clear();
 		for (var i=0; i<fnxs.length;i++) {
+			if (ci >= c.length) ci = 0;
 			var fn = fnxs[i].split(" ").map(genFn).join(" ");
 			var f = new Function("x	", 	"return " + fn);
-			funGraph.apply(null,drawFn(f, c, false));
+			var cc = $(c[ci]).val();
+			console.log(cc);
+			funGraph.apply(null,drawFn(f, cc, false));
+			ci ++;
 		}
 		return fnxs.join(", ");
 	} else {
 		var fn = input.split(" ").map(genFn).join(" ");
 		var f = new Function("x	", 	"return " + fn);
-		funGraph.apply(null,drawFn(f, c));
+		var cc = $(c[ci]).val();
+		funGraph.apply(null,drawFn(f, cc));
 		return fn;	
 	}
 }
@@ -132,8 +149,9 @@ $(document).ready(function() {
 		constructFn();
 	});
 	
-	$("#test").on("click", function() {
+	$("#reset").on("click", function() {
 		var c = $('#color').children("option").filter(":selected").val()
+		$("#userFn").val("sin(2*x)");
 		funGraph.apply(null, drawFn(fun3, c));
 	})
 	
@@ -145,6 +163,9 @@ $(document).ready(function() {
 	});
 	
 	$("#f1").html($("#userFn").val());
+	$("#color").on('change',function(e) {
+		$('#userFnSubmit').click();		
+	});
 	
 	$(function () {
         var $react1, a1, f1;
