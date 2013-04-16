@@ -126,7 +126,7 @@ function constructFn() {
 	if (fnxs.length > 1) {
 		clear();
 		for (var i=0; i<fnxs.length;i++) {
-			if (ci >= c.length) ci = 0;
+			if (ci == c.length) ci = 0;
 			var fn = fnxs[i].split(" ").map(genFn).join(" ");
 			var f = new Function("x	", 	"return " + fn);
 			var cc = $(c[ci]).val();
