@@ -134,7 +134,7 @@ $(document).ready(function() {
 	
 	$("#test").on("click", function() {
 		var c = $('#color').children("option").filter(":selected").val()
-		drawFn(fun3, c);
+		funGraph.apply(null, drawFn(fun3, c));
 	})
 	
 	$('#userFn').keypress(function (e) {
@@ -143,6 +143,8 @@ $(document).ready(function() {
 	    $('#userFnSubmit').click();
 	  }
 	});
+	
+	$("#f1").html($("#userFn").val());
 	
 	$(function () {
         var $react1, a1, f1;
@@ -153,7 +155,7 @@ $(document).ready(function() {
             	var c = constructFn();
             	return c;
             }).bindTo(a1);
-            $R.dom($react1.find(".f1")).bindAttributeTo("innerHTML", f1);
+            $R.dom($react1.find("#f1")).bindAttributeTo("innerHTML", f1);
         }
     });
     
