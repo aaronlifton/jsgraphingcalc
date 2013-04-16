@@ -78,33 +78,49 @@ function funGraph (ctx,axes,func,color,thick) {
  ctx.stroke();
 }
 
-function genFn(part) {	
+function findInfix(part) {
 	// pow
-	var inputFn = [];
-    var re1='([0-9]|x)';	// Any Single Character 1
- 	var re2='(\\^)';	// Any Single Character 2
- 	var re3='(\\d+)';	// Integer Number 1
+	var re1='([0-9]|x)';	// Any Single Character 1
+	var re2='(\\^)';	// Any Single Character 2
+	var re3='(\\d+)';	// Integer Number 1
 	var r = new RegExp(re1+re2+re3,["i"]);
 	var match = r.exec(part);
 	if(match != null && match.length > 0) {
 		if(match[3] !== null) {
 			// inputFn.push("Math.pow(x,"+power+")");
 			var rr = part.replace(r, "Math.pow(" + match[1] +","+match[3]+")");
-			inputFn.push(rr)
+			return rr;
 		}
+	} else {
+		return part;
 	}
-	
-	// func(x+1)
-    var pre='((?:[a-z][a-z]+))';
-    var parens='(\\((.*?)\\))';
-    r = new RegExp(pre+parens,["i"]);
-	match = r.exec(part);
+}
+
+function findParens(part) {
+	var pre='((?:[a-z][a-z]+))';
+	var parens='(\\((.*?)\\))';
+	var r = new RegExp(pre+parens,["i"]);
+	var match = r.exec(part);
 	if (match != null) {
 		var rr = part.replace(r, "Math."+match[1]+"("+match[3]+")");
-		inputFn.push(rr);
 		console.log(match.join(" "));
+		return rr;
+	} else {
+		return part;
 	}
-	
+}
+
+function genFn(part) {	
+	// pow
+	var inputFn = [];
+	part = part.replace(/ /g, '');
+	console.log(part);
+    part = findParens(part);
+   	console.log(part);
+    var f1 = findInfix(part);
+	inputFn.push(f1)
+	// func(x+1)
+    	
 	// fallback to part
 	if (inputFn.length == 0){
 		inputFn.push(part);
@@ -127,7 +143,7 @@ function constructFn() {
 		clear();
 		for (var i=0; i<fnxs.length;i++) {
 			if (ci == c.length) ci = 0;
-			var fn = fnxs[i].split(" ").map(genFn).join(" ");
+			var fn = genFn(fnxs[i]);
 			var f = new Function("x	", 	"return " + fn);
 			var cc = $(c[ci]).val();
 			console.log(cc);
