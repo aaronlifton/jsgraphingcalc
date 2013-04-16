@@ -37,19 +37,22 @@ function draw() {
 	funGraph(ctx, axes, fun4, "rgb(99,88,125)", 3);
 }
 
-function drawFn(funX,color) {
+function drawFn(funX,color,clear) {
+ if (clear == null) clear=true;
  var canvas = document.getElementById("canvas");
  if (null==canvas || !canvas.getContext) return;
 
  var axes={}, ctx=canvas.getContext("2d");
- ctx.clearRect (0,0,canvas.width,canvas.height);
+ if (clear) {
+ 	ctx.clearRect (0,0,canvas.width,canvas.height);
+ }
  
  axes.x0 = .5 + .5*canvas.width;  // x0 pixels from left to x=0
  axes.y0 = .5 + .5*canvas.height; // y0 pixels from top to y=0
  axes.scale = 80;                 // 40 pixels from x=0 to x=1
  axes.doNegativeX = true;
  showAxes(ctx,axes);
- funGraph(ctx,axes,funX,color,1);
+ return [ctx,axes,funX,color,1];
 }
 
 function clear() {
@@ -104,14 +107,24 @@ function genFn(part) {
 
 function constructFn() {
 	var input = $("#userFn").val();
+	var fnxs = input.split(",");
 	
-	var fn = input.split(" ").map(genFn).join(" ");
-	var f = new Function("x	", 	"return " + fn)
 	
 	var c = $('#color').children("option").filter(":selected").val()
-	
-	drawFn(f, c);
-	return fn;
+	if (fnxs.length > 1) {
+		clear();
+		for (var i=0; i<fnxs.length;i++) {
+			var fn = fnxs[i].split(" ").map(genFn).join(" ");
+			var f = new Function("x	", 	"return " + fn);
+			funGraph.apply(null,drawFn(f, c, false));
+		}
+		return fnxs.join(", ");
+	} else {
+		var fn = input.split(" ").map(genFn).join(" ");
+		var f = new Function("x	", 	"return " + fn);
+		funGraph.apply(null,drawFn(f, c));
+		return fn;	
+	}
 }
 
 $(document).ready(function() {
@@ -143,5 +156,22 @@ $(document).ready(function() {
             $R.dom($react1.find(".f1")).bindAttributeTo("innerHTML", f1);
         }
     });
+    
+    $(window).on("resize", function () {
+       	var ctx = canvas.getContext("2d");
+       	var w = $(window).width();
+       	var h = $(window).height();
+       	var f;
+       	if(w < 1002) {
+	        ctx.canvas.width = $(window).width()-10;
+	    }
+        if(h < 502) {
+	        ctx.canvas.height = $(window).height()-10;
+	    }
+	    if(w < 1002 || h < 5012) {
+	    	constructFn();
+	    }
+    });
+    
 
 });
